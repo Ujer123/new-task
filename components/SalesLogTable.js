@@ -98,6 +98,25 @@ const handleSaveNotes = async () => {
     }));
   };
 
+  const handleDelete = async (productId) => {
+    try {
+      const response = await fetch(`https://task-backend-tfp7.onrender.com/products/${productId}`, {
+        method: "DELETE",
+      });
+  
+      if (response.ok) {
+        // Remove the deleted product from the local state
+        setProducts((prevProducts) =>
+          prevProducts.filter((product) => product._id !== productId)
+        );
+      } else {
+        console.error("Failed to delete product");
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   const handleStatusChange = async (productId, newStatus) => {
     try {
       const response = await fetch(`https://task-backend-tfp7.onrender.com/${productId}`, {
@@ -271,6 +290,8 @@ const handleSaveNotes = async () => {
       // Toggle the status between Open and Closed
       const newStatus = row.status === "Open" ? "Closed" : "Open";
       handleStatusChange(row._id, newStatus); // Change status to Open/Closed
+    }else if (selectedOption === "delete") {
+      handleDelete(row._id);  // Delete action
     }
   }}
   className="block w-full bg-slate-200 py-2 border-0 focus:border-0 rounded-md"
@@ -281,6 +302,7 @@ const handleSaveNotes = async () => {
   </option>
   <option value="edit">Edit</option>
   <option value="duplicate">Duplicate</option>
+  <option value="delete">Delete</option>
 </select>
 
                   </div>
