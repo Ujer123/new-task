@@ -119,7 +119,7 @@ const handleSaveNotes = async () => {
 
   const handleStatusChange = async (productId, newStatus) => {
     try {
-      const response = await fetch(`https://task-backend-tfp7.onrender.com/${productId}`, {
+      const response = await fetch(`http://localhost:5000/products/${productId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -128,12 +128,12 @@ const handleSaveNotes = async () => {
       });
 
       if (response.ok) {
-        // Update the local state after a successful update
         setProducts((prevProducts) =>
           prevProducts.map((product) =>
             product._id === productId ? { ...product, status: newStatus } : product
           )
         );
+        setOpenDropdownRow(null); // Close the dropdown after updating
       } else {
         console.error("Failed to update status");
       }
@@ -288,12 +288,13 @@ const handleSaveNotes = async () => {
       handleDuplicate(row._id);  // Duplicate action
     } else if (selectedOption === "change-status") {
       // Toggle the status between Open and Closed
-      const newStatus = row.status === "Open" ? "Closed" : "Open";
-      handleStatusChange(row._id, newStatus); // Change status to Open/Closed
+      // const newStatus = row.status === "Open" ? "Closed" : "Open";
+      // handleStatusChange(row._id, newStatus); // Change status to Open/Closed
     }else if (selectedOption === "delete") {
       handleDelete(row._id);  // Delete action
     }
   }}
+  value={row.status} 
   className="block w-full bg-slate-200 py-2 border-0 focus:border-0 rounded-md"
 >
   <option value="">Option</option>
