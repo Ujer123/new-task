@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { FaFilter, FaTimes } from "react-icons/fa";
+import { CiCirclePlus } from "react-icons/ci";
 
 const SalesLogTable = () => {
   const [products, setProducts] = useState([]); // Store fetched products
@@ -212,9 +213,9 @@ const handleSaveNotes = async () => {
                 {row.notes ? row.notes : (
                   <button
                     onClick={() => handleNotesModal(row._id)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                    className="flex border border-black text-sm font-bold px-4 py-2 rounded-sm ms-5"
                   >
-                    Add Notes
+                    <span className="flex text-blue-700 pe-2"><CiCirclePlus size={18}/></span> Add Notes
                   </button>
                 )}
               </td>
