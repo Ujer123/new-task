@@ -12,7 +12,7 @@ export default function NewTaskModal({ isOpen, onClose, existingTask, onSave, ro
       time: { hours: "",minutes: "", period: "AM" },
       task: "Call",
       person: "",
-      notes: "",
+      notes: "Open",
       status: "",
     }
   );
