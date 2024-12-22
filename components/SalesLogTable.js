@@ -16,15 +16,15 @@ const SalesLogTable = () => {
     status: false,
   });
   const [openDropdownRow, setOpenDropdownRow] = useState(null);
-  // const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
 const [selectedProduct, setSelectedProduct] = useState(null); // State for the product being edited
+const [noteInput, setNoteInput] = useState(""); 
 
 const handleNotesModal = (productId) => {
   const product = products.find((prod) => prod._id === productId);
   setSelectedProduct(product);
-  console.log(product);
-  
-  // setIsModalOpen(true); // Open the modal
+  setNoteInput(product?.notes || ""); // Pre-fill with existing notes
+  setIsModalOpen(true); // Open the modal
 };
 
 const handleRowClick = (row) => {
@@ -36,21 +36,26 @@ const handleRowClick = (row) => {
 const handleSaveNotes = async () => {
   if (selectedProduct) {
     try {
-      const response = await fetch(`https://task-backend-tfp7.onrender.com/products/${selectedProduct._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ notes: selectedProduct.notes }), // Update notes field
-      });
+      const response = await fetch(
+        `https://task-backend-tfp7.onrender.com/products/${selectedProduct._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ notes: noteInput }),
+        }
+      );
 
       if (response.ok) {
         setProducts((prevProducts) =>
           prevProducts.map((product) =>
-            product._id === selectedProduct._id ? { ...product, notes: selectedProduct.notes } : product
+            product._id === selectedProduct._id
+              ? { ...product, notes: noteInput }
+              : product
           )
         );
-        // setIsModalOpen(false); // Close modal after saving
+        setIsModalOpen(false); // Close modal after saving
       } else {
         console.error("Failed to update notes");
       }
@@ -312,6 +317,35 @@ const handleSaveNotes = async () => {
             ))}
           </tbody>
         </table>
+        {isModalOpen && (
+        <div className="modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="modal-content w-56 bg-white p-4 rounded shadow-lg">
+            <h2 className="text-lg font-bold mb-4">
+              Add Notes for {selectedProduct?.name}
+            </h2>
+            <textarea
+              value={noteInput}
+              onChange={(e) => setNoteInput(e.target.value)}
+              rows={5}
+              className="border w-full p-2 mb-4"
+            />
+            <div className="modal-actions flex justify-end gap-2">
+              <button
+                onClick={handleSaveNotes}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
