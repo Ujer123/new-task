@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { FaFilter, FaTimes } from "react-icons/fa";
 import { CiCirclePlus } from "react-icons/ci";
 
-const SalesLogTable = () => {
+const SalesLogTable = ({openModal}) => {
   const [products, setProducts] = useState([]); // Store fetched products
   const [filters, setFilters] = useState({});
   const [filterStates, setFilterStates] = useState({
@@ -149,15 +149,56 @@ const handleSaveNotes = async () => {
   });
 
 
-  const handleEdit = (productId) => {
-    console.log("Edit Product with ID:", productId);
-    // Implement edit functionality here
+  const handleEdit = (row) => {
+    openModal(row); // Pass the entire row data to the modal
   };
 
-  const handleDuplicate = (productId) => {
+  const handleDuplicate = async (productId) => {
     console.log("Duplicate Product with ID:", productId);
-    // Implement duplication functionality here
-  };
+
+    try {
+        // Fetch the product data using its ID
+        const response = await fetch(`https://task-backend-tfp7.onrender.com/products/${productId}`);
+
+        // Check if the response is OK (status code 200-299)
+        if (!response.ok) {
+            console.error(`Failed to fetch product: ${response.status} ${response.statusText}`);
+            throw new Error(`Failed to fetch product: ${response.statusText}`);
+        }
+
+        // Attempt to parse JSON response
+        const productData = await response.json();
+
+        // Log the productData to verify it's being fetched correctly
+        console.log('Fetched product data:', productData);
+
+        // Make a copy of the product data and remove the ID to avoid conflict
+        const newProduct = { ...productData, _id: undefined }; // Remove ID
+
+        // Create a new product with the copied data
+        const createResponse = await fetch('https://task-backend-tfp7.onrender.com/products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newProduct),
+        });
+
+        // Check if the creation request was successful
+        if (!createResponse.ok) {
+            console.error(`Failed to create product: ${createResponse.status} ${createResponse.statusText}`);
+            throw new Error(`Failed to create product: ${createResponse.statusText}`);
+        }
+
+        const result = await createResponse.json();
+
+        console.log('Product duplicated successfully:', result);
+        alert('Product duplicated successfully!');
+    } catch (error) {
+        console.error('Error in duplication:', error);
+        alert('An error occurred while duplicating the product.');
+    }
+};
 
 
   return (

@@ -1,21 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function NewTaskModal({ isOpen, onClose, existingTask, onSave, row }) {
+export default function NewTaskModal({ isOpen, onClose, existingTask, onSave }) {
   // If `existingTask` is provided, it's an update; otherwise, it's a new task.
   const isUpdate = !!existingTask;
-  const [notes, setNotes] = useState(row ? row.notes : "");
 
-  const [taskData, setTaskData] = useState(
-    existingTask || {
-      entity: "",
-      date: "",
-      time: { hours: "",minutes: "", period: "AM" },
-      task: "Call",
-      person: "",
-      notes: "",
-      status: "Open",
+  const [taskData, setTaskData] = useState(() => {
+    // Initialize time fields to prevent undefined issues
+    const defaultTime = { hours: "12", minutes: "00", period: "AM" };
+    const time = existingTask?.time || defaultTime;
+
+    return {
+      entity: existingTask?.entity || "",
+      date: existingTask?.date || "",
+      time: {
+        hours: String(time.hours), // Ensure it's a string
+        minutes: String(time.minutes), // Ensure it's a string
+        period: String(time.period), // Ensure it's a string
+      },
+      task: existingTask?.task || "Call",
+      person: existingTask?.person || "",
+      notes: existingTask?.notes || "",
+      status: existingTask?.status || "Open",
+    };
+  });
+
+
+  useEffect(() => {
+    if (existingTask) {
+      const time = existingTask.time || { hours: "12", minutes: "00", period: "AM" };
+      setTaskData({
+        entity: existingTask.entity || "",
+        date: existingTask.date || "",
+        time: {
+          hours: String(time.hours),
+          minutes: String(time.minutes),
+          period: String(time.period),
+        },
+        task: existingTask.task || "Call",
+        person: existingTask.person || "",
+        notes: existingTask.notes || "",
+        status: existingTask.status || "Open",
+      });
     }
-  );
+  }, [existingTask]);
+
 
   if (!isOpen) return null;
 
@@ -80,19 +108,7 @@ export default function NewTaskModal({ isOpen, onClose, existingTask, onSave, ro
       console.error("Error submitting task:", error);
       alert("An error occurred while submitting the task.");
     }
-  };
-
-  const handleSave = () => {
-    if (notes.trim()) {
-      // Save notes logic (call backend or update state)
-      // You can update the parent state with the new notes
-      console.log("Notes saved:", notes);
-      onClose(); // Close the modal after saving
-    } else {
-      alert("Please enter notes");
-    }
-  };
-  
+  }; 
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -136,47 +152,46 @@ export default function NewTaskModal({ isOpen, onClose, existingTask, onSave, ro
               <input
                 type="date"
                 name="date"
-                value={taskData.date}
+                value={taskData.date || ""}
                 onChange={handleInputChange}
                 className="flex-1 border px-3 py-3 focus:ring focus:ring-sky-300"
               />
-            <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-md shadow-md">
-  <select
-    name="hours"
-    value={taskData.time.hours}
-    onChange={(e) => handleTimeChange("hours", e.target.value)}
-    className="border-none bg-transparent text-center appearance-none focus:outline-none"
-  >
-    {Array.from({ length: 12 }, (_, i) => (
-      <option key={i + 1} value={i + 1}>
-        {String(i + 1).padStart(2, "0")}
-      </option>
-    ))}
-  </select>
-  <span>:</span>
-  <select
-    name="minutes"
-    value={taskData.time.minutes}
-    onChange={(e) => handleTimeChange("minutes", e.target.value)}
-    className="border-none bg-transparent text-center appearance-none focus:outline-none"
-  >
-    {Array.from({ length: 60 }, (_, i) => (
-      <option key={i} value={i}>
-        {String(i).padStart(2, "0")}
-      </option>
-    ))}
-  </select>
-  <select
-    name="period"
-    value={taskData.time.period}
-    onChange={(e) => handleTimeChange("period", e.target.value)}
-    className="border-none bg-transparent text-center appearance-none focus:outline-none"
-  >
-    <option value="AM">AM</option>
-    <option value="PM">PM</option>
-  </select>
-</div>
-
+              <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-md shadow-md">
+                <select
+                  name="hours"
+                  value={taskData.time.hours || "12"}
+                  onChange={(e) => handleTimeChange("hours", e.target.value)}
+                  className="border-none bg-transparent text-center appearance-none focus:outline-none"
+                >
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
+                      {String(i + 1).padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+                <span>:</span>
+                <select
+                  name="minutes"
+                  value={taskData.time.minutes || "00"}
+                  onChange={(e) => handleTimeChange("minutes", e.target.value)}
+                  className="border-none bg-transparent text-center appearance-none focus:outline-none"
+                >
+                  {Array.from({ length: 60 }, (_, i) => (
+                    <option key={i} value={String(i).padStart(2, "0")}>
+                      {String(i).padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  name="period"
+                  value={taskData.time.period || "AM"}
+                  onChange={(e) => handleTimeChange("period", e.target.value)}
+                  className="border-none bg-transparent text-center appearance-none focus:outline-none"
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
             </div>
 
             {/* Task Type */}
