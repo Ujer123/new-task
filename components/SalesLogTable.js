@@ -119,7 +119,7 @@ const handleSaveNotes = async () => {
 
   const handleStatusChange = async (productId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/products/${productId}`, {
+      const response = await fetch(`https://task-backend-tfp7.onrender.com/products/${productId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
