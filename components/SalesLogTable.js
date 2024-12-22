@@ -27,11 +27,6 @@ const handleNotesModal = (productId) => {
   setIsModalOpen(true); // Open the modal
 };
 
-const handleRowClick = (row) => {
-  if (!row.notes) {
-    openModal(row); // If notes are empty, open the modal
-  }
-};
 
 const handleSaveNotes = async () => {
   if (selectedProduct) {
@@ -292,9 +287,8 @@ const handleSaveNotes = async () => {
     } else if (selectedOption === "duplicate") {
       handleDuplicate(row._id);  // Duplicate action
     } else if (selectedOption === "change-status") {
-      // Toggle the status between Open and Closed
-      // const newStatus = row.status === "Open" ? "Closed" : "Open";
-      // handleStatusChange(row._id, newStatus); // Change status to Open/Closed
+      const newStatus = row.status === "Open" ? "Closed" : "Open";
+      handleStatusChange(row._id, newStatus); // Change status to Open/Closed
     }else if (selectedOption === "delete") {
       handleDelete(row._id);  // Delete action
     }
